@@ -17,12 +17,12 @@ class UserSeeder extends Seeder
     {
         $user = User::firstOrCreate(
             [
-                'email'    => "admin@example.com",
+                'email'    => "administrador@example.com",
             ],
             [
             'name'     => 'Admin',
-            'email'    => "admin@example.com",
-            'password' => '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', // secret
+            'email'    => "administrador@example.com",
+            'password' => '$2y$10$Ft2dGn92d3YkzYisP0CkwetZKlDRfQgZm0UubikG436QFlNUdXcXq', //admin4321
             ]
         );
 

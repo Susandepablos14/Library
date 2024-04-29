@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Book;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Book\BookUpdateRequest;
+use App\Http\Requests\Copy\CopyUpdateRequest;
 use App\Models\Book;
 use App\Models\Copy;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UpdatedController extends Controller
 {
-    public function updated(BookUpdateRequest $request,Book $id)
+    public function updated(BookUpdateRequest $request, Book $id)
     {
         try {
             DB::beginTransaction();
@@ -34,65 +35,6 @@ class UpdatedController extends Controller
             DB::commit();
 
             return response()->json(Response::HTTP_OK);
-
-        } catch (ValidationException $ex) {
-            return response()->json(
-                [
-                'data' => [
-                    'title'  => $ex->getMessage(),
-                    'errors' => collect($ex->errors())->flatten()
-                ]
-                ], Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-        } catch (\Exception $ex) {
-            DB::rollBack();
-            return response()->json(
-                [
-                'data' => [
-                    'code'        => $ex->getCode(),
-                    'title'       => __('errors.server.title'),
-                    'description' => __('errors.server.description'),
-                ]
-                ], Response::HTTP_INTERNAL_SERVER_ERROR
-            );
-        }
-    }
-
-    public function updatedCopy(BookUpdateRequest $request, $bookId)
-    {
-        try {
-            DB::beginTransaction();
-
-            // Encuentra todas las copias relacionadas con el book_id
-            $copies = Copy::where('book_id', $bookId)->get();
-
-            foreach ($copies as $copy) {
-                if ($request->status === 'Disponible') {
-                    $copy->quantity += $request->quantity;
-                    $copy->save();
-                } elseif ($request->status === 'Dañado') {
-                    $copy->quantity -= $request->quantity;
-                    if ($copy->quantity < 0) {
-                        $copy->quantity = 0;
-                    }
-
-                    // Crear nueva copia en caso de que la cantidad sea negativa
-                    if ($copy->quantity === 0) {
-                        $newCopy = new Copy();
-                        $newCopy->book_id = $copy->book_id;
-                        $newCopy->quantity = $request->quantity;
-                        $newCopy->status = $request->status;
-                        $newCopy->save();
-                    }
-
-                    $copy->save();
-                }
-            }
-
-            DB::commit();
-
-            return response()->json(Response::HTTP_OK);
-
         } catch (ValidationException $ex) {
             return response()->json(
                 [
@@ -100,7 +42,8 @@ class UpdatedController extends Controller
                         'title'  => $ex->getMessage(),
                         'errors' => collect($ex->errors())->flatten()
                     ]
-                ], Response::HTTP_UNPROCESSABLE_ENTITY
+                ],
+                Response::HTTP_UNPROCESSABLE_ENTITY
             );
         } catch (\Exception $ex) {
             DB::rollBack();
@@ -111,9 +54,89 @@ class UpdatedController extends Controller
                         'title'       => __('errors.server.title'),
                         'description' => __('errors.server.description'),
                     ]
-                ], Response::HTTP_INTERNAL_SERVER_ERROR
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
     }
 
+    public function updatedCopy(CopyUpdateRequest $request, $bookId)
+    {
+        DB::beginTransaction();
+        // try {
+        // Obtener todas las copias relacionadas con el libro
+        $copies = Copy::where('book_id', $bookId)->get();
+
+        // Calcular la cantidad total de copias disponibles y perdidas
+        $availableCopies = $copies->whereIn('status', ['Disponible', 'Perdido'])->sum('quantity');
+        $lostCopies = $copies->where('status', 'Perdido')->sum('quantity');
+
+        // Cantidad de copias a agregar
+        $quantityToAdd = $request->quantity;
+
+        // Verificar el estado de la copia y manejar la lógica correspondiente
+        if ($request->status === 'Perdido') {
+            if ($request->reason === 'Prestado') {
+                // Restar la cantidad de copias perdidas del total de copias prestadas
+                $lostCopies += $quantityToAdd;
+            } elseif ($request->reason === 'Disponible') {
+                // Calcular la cantidad total de copias perdidas que se agregarán
+                $totalLostCopies = $lostCopies + $quantityToAdd;
+                // Verificar si la cantidad total de copias perdidas excede la cantidad disponible
+                if ($totalLostCopies > $availableCopies) {
+                    return response()->json(['error' => 'La cantidad de copias perdidas excede la cantidad disponible'], 400);
+                }
+            }
+        } elseif ($request->status === 'Disponible') {
+            // Aumentar la cantidad de copias disponibles
+            $availableCopies += $quantityToAdd;
+        }
+
+        // Actualizar la cantidad de copias disponibles y perdidas para todos los registros
+        foreach ($copies as $copy) {
+            if ($request->status === 'Disponible' && $copy->status === 'Disponible') {
+                $copy->quantity += $quantityToAdd;
+            } elseif ($request->status === 'Perdido' && $copy->status === 'Disponible') {
+                if ($request->reason === 'Prestado') {
+                    // Restar del total de copias prestadas
+                    $copy->quantity -= $quantityToAdd;
+                } elseif ($request->reason === 'Disponible') {
+                    // Restar del total de copias disponibles
+                    $copy->quantity -= $quantityToAdd;
+                }
+                // Asegurarse de que la cantidad no sea negativa
+                if ($copy->quantity < 0) {
+                    $copy->quantity = 0;
+                }
+            }
+            // Guardar los cambios en la copia
+            $copy->save();
+        }
+        DB::commit();
+
+        return response()->json([], Response::HTTP_OK);
+        // } catch (ValidationException $ex) {
+        //     return response()->json(
+        //         [
+        //             'data' => [
+        //                 'title'  => $ex->getMessage(),
+        //                 'errors' => collect($ex->errors())->flatten()
+        //             ]
+        //         ],
+        //         Response::HTTP_UNPROCESSABLE_ENTITY
+        //     );
+        // } catch (\Exception $ex) {
+        //     DB::rollBack();
+        //     return response()->json(
+        //         [
+        //             'data' => [
+        //                 'code'        => $ex->getCode(),
+        //                 'title'       => __('errors.server.title'),
+        //                 'description' => __('errors.server.description'),
+        //             ]
+        //         ],
+        //         Response::HTTP_INTERNAL_SERVER_ERROR
+        //     );
+        // }
+    }
 }

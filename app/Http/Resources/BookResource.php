@@ -33,9 +33,9 @@ class BookResource extends JsonResource
                 'editorial' => new EditorialResource($this->whenLoaded('editorial')),
                 'category' => new CategoryResource($this->whenLoaded('category')),
                 'copies' => CopyResource::collection($this->whenLoaded('copies')),
-                'bookings' => CopyResource::collection($this->whenLoaded('bookings')),
-                'loans' => CopyResource::collection($this->whenLoaded('loans')),
-                'comments' => CopyResource::collection($this->whenLoaded('comments')),
+                'bookings' => BookResource::collection($this->whenLoaded('bookings')),
+                // 'loans' => LoanResource::collection($this->whenLoaded('loans')),
+                // 'comments' => CommentResource::collection($this->whenLoaded('comments')),
                 'image' => new ImageResource($this->whenLoaded('image')),
             ]
         ];

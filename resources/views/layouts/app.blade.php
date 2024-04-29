@@ -77,7 +77,7 @@
                             <a class="dropdown-item" href="{{ route('profile.index') }}">Perfil</a>
                             <a class="dropdown-item" href="{{ route('password.index') }}">Contraseña</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Cerrar Sesión</a>
                         </div>
                     </li>
                 </ul>
@@ -145,6 +145,12 @@
                                 @can('books.index')
                                     <a class="dropdown-item" href="{{ route('books.index') }}">Libros</a>
                                 @endcan
+                                @can('copies.index')
+                                    <a class="dropdown-item" href="{{ route('copies.index') }}">Copias</a>
+                                @endcan
+                                @can('bookings.index')
+                                <a class="dropdown-item" href="{{ route('bookings.index') }}">Reservaciones</a>
+                            @endcan
                             </div>
                         </li>
                     @endcan
@@ -173,17 +179,18 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">¿Listo/a para salir?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-body">
+                    Seleccione "Cerrar sesión" a continuación si está listo/a para finalizar su sesión actual.</div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <button class="btn btn-danger" type="button" data-dismiss="modal">Cancelar</button>
                     <a class="btn btn-primary" href="{{ route('logout') }}" onclick="event.preventDefault();
                                                          document.getElementById('logout-form').submit();">
-                        {{ __('Logout') }}
+                        {{ __('Cerrar Sesión') }}
                     </a>
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                         @csrf

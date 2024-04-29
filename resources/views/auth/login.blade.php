@@ -20,7 +20,7 @@
 
 </head>
 
-<body class="bg-light">
+<body style="background-color: #006cff">
     <div class="container">
         <div class="card card-login mx-auto mt-5">
             <div style="text-align: center;">
@@ -41,7 +41,7 @@
                                 </span>
                             @enderror
 
-                            <label for="inputEmail">Email address</label>
+                            <label for="inputEmail">Correo Electrónico</label>
                         </div>
                     </div>
                     <div class="form-group">
@@ -54,7 +54,7 @@
                                 </span>
                             @enderror
 
-                            <label for="inputPassword">Password</label>
+                            <label for="inputPassword">Contraseña</label>
                         </div>
                     </div>
                     <div class="form-group">
@@ -62,17 +62,17 @@
                             <label>
                                 <input type="checkbox" value="remember-me" name="remember" id="remember"
                                     {{ old('remember') ? 'checked' : '' }}>
-                                Remember Password
+                                Recordar Contraseña
                             </label>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">
-                        {{ __('Login') }}
+                    <button type="submit" class="btn btn-secondary btn-block">
+                        {{ __('Iniciar Sesión') }}
                     </button>
                 </form>
                 <div class="text-center">
                     {{-- <a class="d-block small" href="{{ route('password.request') }}">Recuperar Contraseña?</a> --}}
-                    <a class="d-block small mt-3" href="{{ route('register') }}">Registrarse</a>
+                    <a class="d-block small mt-3" style="color: #5f5f5f" href="{{ route('register') }}">Registrarse</a>
                 </div>
             </div>
         </div>

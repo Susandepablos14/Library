@@ -82,6 +82,14 @@ class PermissionSeeder extends Seeder
         'copies.delete',
         'copies.updated',
         'copies.getPaginate',
+
+        //reservaciones
+
+        'bookings.index',
+        'bookings.create',
+        'bookings.delete',
+        'bookings.updated',
+        'bookings.getPaginate',
     ];
     /**
      * Run the database seeds.

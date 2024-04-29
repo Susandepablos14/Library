@@ -26,4 +26,12 @@ class Booking extends Model
     {
         return $this->belongsTo(Book::class);
     }
+    public function scopeFilter($query, $request)
+    {
+        return $query
+            ->when($request->status, function ($query, $status) {
+                return $query->where('status', 'like', "%status%");
+            });
+    }
+
 }

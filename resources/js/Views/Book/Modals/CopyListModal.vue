@@ -72,7 +72,7 @@ export default {
             }
 
             const bookId = copies[0].book_id;
-            const copyId = copies[1] ? copies[1].id : null;
+            const copyId = copies[0] ? copies[0].id : null;
 
             this.$refs.addCopyModalRef.showAddCopyModal(bookId, copyId);
         },

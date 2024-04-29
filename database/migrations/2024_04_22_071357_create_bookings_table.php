@@ -24,7 +24,7 @@ class CreateBookingsTable extends Migration
                 ->restrictOnDelete()
                 ->cascadeOnUpdate();
             $table->date('reservation_date');
-            $table->enum('status', ['Activa', 'Cancelada'])->default('Activa');
+            $table->enum('status', ['Activa', 'Completada', 'Cancelada'])->default('Activa');
             $table->softDeletes();
             $table->timestamps();
         });

@@ -19,7 +19,7 @@ class CreateCopiesTable extends Migration
                   ->constrained()
                   ->restrictOnDelete()
                   ->cascadeOnUpdate();
-            $table->enum('status', ['Disponible', 'Reservado', 'Prestado', 'Dañado'])->default('Disponible');
+            $table->enum('status', ['Disponible', 'Reservado', 'Prestado', 'Perdido'])->default('Disponible');
             $table->integer('quantity')->default(1);
             $table->softDeletes();
             $table->timestamps();

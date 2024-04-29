@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Copy;
+namespace App\Http\Controllers\Booking;
 
 use App\Http\Controllers\Controller;
-use App\Models\Copy;
-use App\Http\Resources\CopyResource;
+use App\Http\Resources\BookingResource;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
@@ -13,15 +13,15 @@ class IndexController extends Controller
 {
     public function index()
     {
-        return view('copies.index');
+        return view('bookings.index');
     }
 
     public function get(Request $request)
     {
         try {
-            $copy = Copy::with('book')->withTrashed()->get();
+            $booking = Booking::with('user','book')->withTrashed()->filter($request)->get();
 
-            return CopyResource::collection($copy);
+            return BookingResource::collection($booking);
         } catch (ValidationException $ex) {
             return response()->json(
                 [
@@ -47,9 +47,9 @@ class IndexController extends Controller
     public function getPaginate(Request $request)
     {
         try {
-            $copy = Copy::with('book')->get();
+            $booking = Booking::with('user','book')->filter($request)->get();
 
-            return CopyResource::collection($copy)->paginate($request->pag);
+            return Booking::collection($booking)->paginate($request->pag);
         } catch (ValidationException $ex) {
             return response()->json(
                 [
@@ -71,4 +71,5 @@ class IndexController extends Controller
             );
         }
     }
+
 }

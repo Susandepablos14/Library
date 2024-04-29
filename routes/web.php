@@ -164,5 +164,27 @@ Route::group(
         Route::post('{id}/book', [App\Http\Controllers\Book\UpdatedController::class, 'updatedCopy'])
             ->middleware('permission:copies.updated');
     }
+
 );
 
+Route::group(
+    [
+        'prefix'     => 'booking'
+    ],
+    function () {
+
+        Route::get('', [App\Http\Controllers\Booking\IndexController::class, 'index'])
+            ->name('bookings.index')
+            ->middleware('permission:bookings.index');
+
+        Route::post('create', [App\Http\Controllers\Booking\CreateController::class, 'create'])
+            ->middleware('permission:bookings.create');
+
+//         Route::delete('delete/{id}', [App\Http\Controllers\Booking\DeleteController::class, 'destroy'])
+//             ->middleware('permission:bookings.delete');
+
+        Route::get('get', [App\Http\Controllers\Booking\IndexController::class, 'get'])
+            ->middleware('permission:bookings.index');
+    }
+
+);

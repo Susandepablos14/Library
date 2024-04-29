@@ -20,7 +20,7 @@
 
 </head>
 
-<body class="bg-light">
+<body style="background-color: #006cff">
     <div class="container">
         <div class="card card-login mx-auto mt-5">
             <div style="text-align: center;">
@@ -36,7 +36,7 @@
                             <!-- Nombre -->
                             <input id="name" type="text"
                                 class="form-control @error('name') is-invalid @enderror" name="name"
-                                placeholder="{{ __('Name') }}" value="{{ old('name') }}" required autocomplete="name" autofocus>
+                                placeholder="{{ __('Nombre') }}" value="{{ old('name') }}" required autocomplete="name" autofocus>
 
                             @error('name')
                                 <span class="invalid-feedback" role="alert">
@@ -51,7 +51,7 @@
                             <!-- Email -->
                             <input id="email" type="email"
                                 class="form-control @error('email') is-invalid @enderror" name="email"
-                                placeholder="{{ __('Email address') }}" value="{{ old('email') }}" required autocomplete="email">
+                                placeholder="{{ __('Correo Electrónico') }}" value="{{ old('email') }}" required autocomplete="email">
 
                             @error('email')
                                 <span class="invalid-feedback" role="alert">
@@ -66,7 +66,7 @@
                             <!-- Contraseña -->
                             <input id="password" type="password"
                                 class="form-control @error('password') is-invalid @enderror" name="password"
-                                placeholder="{{ __('Password') }}" required autocomplete="new-password">
+                                placeholder="{{ __('Contraseña') }}" required autocomplete="new-password">
 
                             @error('password')
                                 <span class="invalid-feedback" role="alert">
@@ -80,16 +80,16 @@
                         <div class="col-md-12 text-md-end">
                             <!-- Confirmar Contraseña -->
                             <input id="password-confirm" type="password" class="form-control"
-                                name="password_confirmation" placeholder="{{ __('Confirm Password') }}" required autocomplete="new-password">
+                                name="password_confirmation" placeholder="{{ __('Confirmar Contraseña') }}" required autocomplete="new-password">
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block">
-                        {{ __('Register') }}
+                    <button type="submit" class="btn btn-secondary btn-block">
+                        {{ __('Registrarse') }}
                     </button>
                 </form>
                 <div class="text-center">
-                    <a class="d-block small mt-3" href="{{ route('login') }}">Iniciar Sesión</a>
+                    <a class="d-block small mt-3" style="color: #5f5f5f" href="{{ route('login') }}">Iniciar Sesión</a>
                 </div>
             </div>
         </div>
