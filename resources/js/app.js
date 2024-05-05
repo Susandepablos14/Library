@@ -34,6 +34,7 @@ Vue.component('editorials', require('./Views/Editorial/Editorial').default);
 Vue.component('books', require('./Views/Book/Book').default);
 Vue.component('copies', require('./Views/Copy/Copy').default);
 Vue.component('bookings', require('./Views/Booking/Booking').default);
+Vue.component('loans', require('./Views/Loan/Loan').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

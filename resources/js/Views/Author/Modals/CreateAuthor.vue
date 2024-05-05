@@ -101,7 +101,6 @@
                 />
             </div>
             </div>
-            <small class="text-muted">Dimensiones de la imagen mínima:  30x30 / máxima: 80x80</small>
           </div>
           <div class="modal-footer">
             <a

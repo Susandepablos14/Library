@@ -5,14 +5,14 @@
             <li class="breadcrumb-item">
                 <a href="#">Dashboard</a>
             </li>
-            <li class="breadcrumb-item active">Libros</li>
+            <li class="breadcrumb-item active">Prestamos</li>
         </ol>
 
         <!-- DataTables Example -->
         <div class="card mb-3">
             <div class="card-header">
                 <i class="fas fa-table"></i>
-                Data Libros
+                Data Prestamos
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -25,7 +25,7 @@
                         >
                             <i class="fas fa-check"></i>
                             <span class="text font-montserrat font-weight-bold"
-                                >Crear Libro</span
+                                >Crear Prestamo</span
                             >
                         </a>
                     </div>
@@ -38,59 +38,34 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Título</th>
-                                <th>Descripción</th>
-                                <th>Autor</th>
-                                <th>Editorial</th>
-                                <th>Categoría</th>
-                                <th>Fecha de Publicación</th>
+                                <th>Usuario</th>
+                                <th>Libro</th>
+                                <th>Fecha de Prestamo</th>
+                                <th>Fecha de Devolución</th>
+                                <th>Estado</th>
                                 <th>Acción</th>
                             </tr>
                         </thead>
                         <tfoot>
                             <tr>
                                 <th>ID</th>
-                                <th>Título</th>
-                                <th>Descripción</th>
-                                <th>Autor</th>
-                                <th>Editorial</th>
-                                <th>Categoría</th>
-                                <th>Fecha de Publicación</th>
+                                <th>Usuario</th>
+                                <th>Libro</th>
+                                <th>Fecha de Prestamo</th>
+                                <th>Fecha de Devolución</th>
+                                <th>Estado</th>
                                 <th>Acción</th>
                             </tr>
                         </tfoot>
                         <tbody>
                             <tr v-for="keep in keeps" :key="keep.id">
                                 <td>{{ keep.id }}</td>
-                                <td>{{ keep.attributes.title }}</td>
-                                <td class="text-center"  style="max-width: 400px; overflow: auto;">
-                                    <template v-if="keep.showDescription">
-                                        {{ keep.attributes.description }}
-                                    </template>
-                                    <i
-                                        v-on:click.prevent="toggleDescription(keep)"
-                                        class="ico fas fa-eye fa-lg text-secondary"
-                                        style="cursor: pointer;"
-                                        title="Ver Descripción"
-                                    ></i>
-                                </td>
-                                <td>{{ keep.relationships.author.attributes.name }}</td>
-                                <td>{{ keep.relationships.editorial.attributes.name }}</td>
-                                <td>{{ keep.relationships.category.attributes.name }}</td>
-                                <td>{{ keep.attributes.publication_date }}</td>
+                                <td>{{ keep.relationships.user.attributes.name }}</td>
+                                <td>{{ keep.relationships.book.attributes.title }}</td>
+                                <td>{{ keep.attributes.loan_date }}</td>
+                                <td>{{ keep.attributes.return_date }}</td>
+                                <td>{{ keep.attributes.status }}</td>
                                 <td>
-                                    <i
-                                        v-on:click.prevent="
-                                            showCopies(keep)
-                                        "
-                                        v-if="
-                                            updated &&
-                                            !keep.attributes.deleted_at
-                                        "
-                                        class="ico fas fa-book fa-lg text-secondary"
-                                        style="cursor: pointer"
-                                        title="Copias"
-                                    ></i>
                                     <i
                                         v-on:click.prevent="
                                         showImageModal(keep)"
@@ -135,42 +110,21 @@
         </div>
         <create-rol @GetCreatedRol="GetCreatedRol" />
         <update-rol @GetCreatedRol="GetCreatedRol" ref="componente" />
-        <image-viewer :imageUrl="imageUrl" />
-        <CopyListModal :copies="copies" ref="copyListComponent" />
-        <div class="modal fade" id="descriptionModal" tabindex="-1" role="dialog" aria-labelledby="descriptionModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="descriptionModalLabel">Descripción</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p style="word-wrap: break-word;">{{ selectedDescription }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
     </div>
 </template>
 
 <script>
 import axios from "axios";
-import CreateRol from "../Modals/CreateBook.vue";
-import UpdateRol from "../Modals/UpdateBook.vue";
+import CreateRol from "../Modals/CreateLoan.vue";
+import UpdateRol from "../Modals/UpdateLoan.vue";
 import Swal from "sweetalert2";
-import ImageViewer from "../../../components/ImageViewer";
-import CopyListModal from "../Modals/CopyListModal";
 
 export default {
-    name: "BookDataTable",
+    name: "LoanDataTable",
     components: {
         CreateRol,
         UpdateRol,
-        ImageViewer,
-        CopyListModal
     },
     props: {
         create: {
@@ -192,14 +146,11 @@ export default {
     data() {
         return {
             keeps: [],
-            imageUrl: '',
-            selectedDescription: '',
-            copies: [],
         };
     },
     methods: {
         getKeeps: function () {
-            var urlKeeps = "/book/get";
+            var urlKeeps = "/loan/get";
             axios
                 .get(urlKeeps)
                 .then((response) => {
@@ -226,8 +177,8 @@ export default {
                 cancelButtonText: "No",
             }).then((result) => {
                 if (result.value) {
-                    var url = "/book/delete/" + keep.id;
-                    axios.delete(url).then((response) => {
+                    var url = "/loan/delete/" + keep.id;
+                    axios.delete(url).then((ressponse) => {
                         Swal.fire(
                             `¡${successText.charAt(0).toUpperCase() + successText.slice(1)}!`,
                             `El registro ha sido ${successText}.`,
@@ -256,38 +207,6 @@ export default {
 
         GetCreatedRol: function () {
             this.getKeeps();
-        },
-        showImageModal(keep) {
-            if (keep.relationships.image && keep.relationships.image.attributes.path) {
-                const imagePath = keep.relationships.image.attributes.path;
-                this.imageUrl = '/' + imagePath;
-                $('#imageModal').modal('show');
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'No hay imagen disponible.'
-                });
-            }
-        },
-        toggleDescription(keep) {
-            this.selectedDescription = keep.attributes.description;
-            $('#descriptionModal').modal('show');
-        },
-        showCopies(keep) {
-        const url = `/book/${keep.id}/copies`;
-        axios.get(url)
-            .then(response => {
-                this.copies = response.data.data;
-                this.$refs.copyListComponent.showCopiesModal(keep.id);
-            })
-            .catch(error => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Hubo un problema al obtener las copias del libro.'
-                });
-            });
         },
     },
 };

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 
 class CreateController extends Controller
 {
@@ -20,11 +21,11 @@ class CreateController extends Controller
         try {
             DB::beginTransaction();
 
-            $this->createType($request);
+            $bookingId = $this->createType($request);
 
             DB::commit();
 
-            return response()->json(Response::HTTP_OK);
+            return Redirect::route('loan.page', ['id' => $bookingId]);
         } catch (ValidationException $ex) {
             return response()->json(
                 [
@@ -54,8 +55,16 @@ class CreateController extends Controller
     {
         $userId = Auth::id();
         $reservationDate = Carbon::now()->toDateString();
-
         $bookId = $request->book_id;
+
+        $existingBooking = Booking::where('user_id', $userId)
+            ->where('book_id', $bookId)
+            ->where('status', 'Activa')
+            ->first();
+
+        if ($existingBooking) {
+            throw new \Exception('Ya has reservado este libro', 400);
+        }
 
         $availableCopy = Copy::where('book_id', $bookId)
             ->where('status', 'Disponible')

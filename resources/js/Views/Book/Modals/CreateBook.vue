@@ -85,7 +85,7 @@
 
             <label for="publication_date" class="form-label">Fecha de Publicación</label>
               <input
-                type="date"
+                type="text"
                 id="publication_date"
                 class="form-control form-control-user mb-3"
                 autofocus

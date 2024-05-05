@@ -30,7 +30,7 @@ class BookUpdateRequest extends FormRequest
             'author_id' => 'required|exists:authors,id',
             'category_id' => 'required|exists:categories,id',
             'editorial_id' => 'required|exists:editorials,id',
-            'publication_date' => 'required|date',
+            'publication_date' => 'required|string',
             'image' => 'nullable|dimensions:min_width=100,min_height=150,max_width=400,max_height=600',
         ];
 

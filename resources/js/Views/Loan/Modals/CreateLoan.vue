@@ -16,7 +16,7 @@
               class="modal-title title-page text-secondary"
               id="exampleModalLabel"
             >
-              Crear Reservación
+              Crear Prestamo
             </h5>
             <a
               type="button"
@@ -29,14 +29,14 @@
           </div>
           <div class="modal-body">
             <div class="mb-3">
-                <label for="book_id" class="form-label">Libro</label>
+                <label for="booking_id" class="form-label">Libro</label>
                 <select
-                    v-model="form.book_id"
+                    v-model="form.booking_id"
                     class="form-control"
-                    id="book_id"
-                    name="book_id"
+                    id="booking_id"
+                    name="booking_id"
                 >
-                    <option v-for="book in books" :value="book.id">{{ book.title }}</option>
+                    <option v-for="booking in bookings" :value="booking.id">{{ booking.title }} - {{ booking.user }}</option>
                 </select>
               </div>
             </div>
@@ -50,7 +50,7 @@
               >
             </a>
             <a
-              v-on:click.prevent="createBooking()"
+              v-on:click.prevent="createLoan()"
               class="btn btn-primary text-white btn-icon-split mb-4"
             >
               <span class="text font-montserrat font-weight-bold">Crear</span>
@@ -62,27 +62,27 @@
   </form>
 </template>
 
-  <script>
+<script>
 import axios from "axios";
 import toastr from "toastr";
 
 export default {
-  name: "BookingCreate",
+  name: "LoanCreate",
   created() {
     this.getKeeps();
   },
   data() {
     return {
       form: this.getClearFormObject(),
-      books: [],
+      bookings: [],
     };
   },
   methods: {
-    createBooking() {
+    createLoan() {
       const formData = new FormData();
-      formData.append("book_id", this.form.book_id);
+      formData.append("booking_id", this.form.booking_id);
       axios
-        .post("/booking/create", formData, {
+        .post("/loan/create", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -105,29 +105,32 @@ export default {
         });
     },
     getKeeps() {
-        var urlBooks = "/book/get";
+        var urlBooks = "/booking/get";
         axios
           .all([
             axios.get(urlBooks),
           ])
           .then(axios.spread((responseBooks) => {
-            this.books = responseBooks.data.data
-                .filter(book => {
-                return book.relationships.copies.some(copy => {
-                    return copy.attributes.status === "Disponible" && copy.attributes.quantity > 0;
+        this.bookings = responseBooks.data.data
+            .filter(booking => {
+                return booking.relationships.book.relationships.copies.some(copy => {
+                    return copy.attributes.status === "Reservado" && copy.attributes.quantity > 0;
                 });
-                })
-                .map(book => ({
-                title: book.attributes.title,
-                id: book.id
-                }));
-            }))
-            .catch((error) => {});
-      },
+            })
+            .map(booking => ({
+                title: booking.relationships.book.attributes.title,
+                user: booking.relationships.user.attributes.name,
+                id: booking.id
+            }));
+    }))
+    .catch((error) => {
+        // Manejar errores
+    });
+},
     getClearFormObject() {
       return {
         name: "",
-        book_id: "",
+        booking_id: "",
       };
     },
   },

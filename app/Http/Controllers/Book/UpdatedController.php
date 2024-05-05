@@ -63,80 +63,96 @@ class UpdatedController extends Controller
     public function updatedCopy(CopyUpdateRequest $request, $bookId)
     {
         DB::beginTransaction();
-        // try {
-        // Obtener todas las copias relacionadas con el libro
-        $copies = Copy::where('book_id', $bookId)->get();
+        try {
+            $copies = Copy::where('book_id', $bookId)->get();
 
-        // Calcular la cantidad total de copias disponibles y perdidas
-        $availableCopies = $copies->whereIn('status', ['Disponible', 'Perdido'])->sum('quantity');
-        $lostCopies = $copies->where('status', 'Perdido')->sum('quantity');
+            $availableCopies = $copies->whereIn('status', ['Disponible', 'Perdido'])->sum('quantity');
+            $lostCopies = $copies->where('status', 'Perdido')->sum('quantity');
+            $borrowedCopies = $copies->where('status', 'Prestado')->sum('quantity');
+            $quantityToAdd = $request->quantity;
 
-        // Cantidad de copias a agregar
-        $quantityToAdd = $request->quantity;
-
-        // Verificar el estado de la copia y manejar la lógica correspondiente
-        if ($request->status === 'Perdido') {
-            if ($request->reason === 'Prestado') {
-                // Restar la cantidad de copias perdidas del total de copias prestadas
-                $lostCopies += $quantityToAdd;
-            } elseif ($request->reason === 'Disponible') {
-                // Calcular la cantidad total de copias perdidas que se agregarán
-                $totalLostCopies = $lostCopies + $quantityToAdd;
-                // Verificar si la cantidad total de copias perdidas excede la cantidad disponible
-                if ($totalLostCopies > $availableCopies) {
-                    return response()->json(['error' => 'La cantidad de copias perdidas excede la cantidad disponible'], 400);
+            // Verificar si la cantidad de copias perdidas o prestadas excede las disponibles
+            if ($request->status === 'Perdido') {
+                if ($quantityToAdd > $availableCopies) {
+                    return response()->json(['error' => 'No hay suficientes copias disponibles para marcar como perdidas'], 400);
+                }
+            } elseif ($request->status === 'Prestado') {
+                if ($quantityToAdd > $borrowedCopies) {
+                    return response()->json(['error' => 'No hay suficientes copias prestadas para marcar como perdidas'], 400);
                 }
             }
-        } elseif ($request->status === 'Disponible') {
-            // Aumentar la cantidad de copias disponibles
-            $availableCopies += $quantityToAdd;
-        }
 
-        // Actualizar la cantidad de copias disponibles y perdidas para todos los registros
-        foreach ($copies as $copy) {
-            if ($request->status === 'Disponible' && $copy->status === 'Disponible') {
-                $copy->quantity += $quantityToAdd;
-            } elseif ($request->status === 'Perdido' && $copy->status === 'Disponible') {
-                if ($request->reason === 'Prestado') {
-                    // Restar del total de copias prestadas
-                    $copy->quantity -= $quantityToAdd;
-                } elseif ($request->reason === 'Disponible') {
-                    // Restar del total de copias disponibles
-                    $copy->quantity -= $quantityToAdd;
+            if ($request->status === 'Perdido') {
+                if ($request->reason === 'Disponible') {
+                    $availableCopies -= $quantityToAdd;
+                } elseif ($request->reason === 'Prestado') {
+                    $borrowedCopies -= $quantityToAdd;
                 }
-                // Asegurarse de que la cantidad no sea negativa
-                if ($copy->quantity < 0) {
-                    $copy->quantity = 0;
+
+                // Verificar si hay una copia existente con estado perdido
+                if ($lostCopies > 0) {
+                    // Sumar la cantidad a la copia existente si no excede la cantidad disponible
+                    $newLostQuantity = $lostCopies + $quantityToAdd;
+                    if ($newLostQuantity <= $availableCopies) {
+                        // Actualizar la cantidad de copias perdidas
+                        $lostCopies += $quantityToAdd;
+                        // Guardar los cambios en la copia perdida existente
+                        $lostCopy = $copies->where('status', 'Perdido')->first();
+                        $lostCopy->quantity = $newLostQuantity;
+                        $lostCopy->save();
+                    } else {
+                        return response()->json(['error' => 'No hay suficientes copias disponibles para marcar como perdidas'], 400);
+                    }
+                } else {
+                    // Crear una nueva copia perdida si no existe
+                    $newLostCopy = new Copy();
+                    $newLostCopy->book_id = $bookId;
+                    $newLostCopy->status = 'Perdido';
+                    $newLostCopy->quantity = $quantityToAdd;
+                    $newLostCopy->save();
                 }
+            } elseif ($request->status === 'Prestado') {
+                // Restar del total de copias prestadas
+                $borrowedCopies -= $quantityToAdd;
             }
-            // Guardar los cambios en la copia
-            $copy->save();
-        }
-        DB::commit();
+
+            // Actualizar la cantidad de copias disponibles para todos los registros
+            foreach ($copies as $copy) {
+                if ($request->status === 'Disponible' && $copy->status === 'Disponible') {
+                    $copy->quantity += $quantityToAdd;
+                } elseif ($request->status === 'Perdido' && $copy->status === 'Disponible') {
+                    $copy->quantity -= $quantityToAdd;
+                    if ($copy->quantity < 0) {
+                        $copy->quantity = 0;
+                    }
+                }
+                $copy->save();
+            }
+            DB::commit();
 
         return response()->json([], Response::HTTP_OK);
-        // } catch (ValidationException $ex) {
-        //     return response()->json(
-        //         [
-        //             'data' => [
-        //                 'title'  => $ex->getMessage(),
-        //                 'errors' => collect($ex->errors())->flatten()
-        //             ]
-        //         ],
-        //         Response::HTTP_UNPROCESSABLE_ENTITY
-        //     );
-        // } catch (\Exception $ex) {
-        //     DB::rollBack();
-        //     return response()->json(
-        //         [
-        //             'data' => [
-        //                 'code'        => $ex->getCode(),
-        //                 'title'       => __('errors.server.title'),
-        //                 'description' => __('errors.server.description'),
-        //             ]
-        //         ],
-        //         Response::HTTP_INTERNAL_SERVER_ERROR
-        //     );
-        // }
+        } catch (ValidationException $ex) {
+            return response()->json(
+                [
+                    'data' => [
+                        'title'  => $ex->getMessage(),
+                        'errors' => collect($ex->errors())->flatten()
+                    ]
+                ],
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            return response()->json(
+                [
+                    'data' => [
+                        'code'        => $ex->getCode(),
+                        'title'       => __('errors.server.title'),
+                        'description' => __('errors.server.description'),
+                    ]
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }

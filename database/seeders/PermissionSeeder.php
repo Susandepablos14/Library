@@ -9,8 +9,13 @@ class PermissionSeeder extends Seeder
 {
 
     const PERMISSIONS = [
-        'seguridad',
+        'security',
         'config',
+
+        'toogle',
+        'home',
+        'footer',
+        'statistics',
 
         'permissions.index',
         'permissions.create',
@@ -74,6 +79,8 @@ class PermissionSeeder extends Seeder
         'books.delete',
         'books.updated',
         'books.getPaginate',
+        'books.detail',
+        'books.loan',
 
         //copias
 
@@ -90,6 +97,14 @@ class PermissionSeeder extends Seeder
         'bookings.delete',
         'bookings.updated',
         'bookings.getPaginate',
+
+        //prestamos
+
+        'loans.index',
+        'loans.create',
+        'loans.delete',
+        'loans.updated',
+        'loans.getPaginate',
     ];
     /**
      * Run the database seeds.

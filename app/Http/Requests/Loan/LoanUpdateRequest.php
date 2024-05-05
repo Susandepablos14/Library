@@ -25,7 +25,7 @@ class LoanUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'book_id'  => 'required|exists:books,id',
+            'booking_id'  => 'required|exists:bookings,id',
         ];
 
     }

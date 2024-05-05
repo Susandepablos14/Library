@@ -19,7 +19,7 @@ class IndexController extends Controller
     public function get(Request $request)
     {
         try {
-            $booking = Booking::with('user','book')->withTrashed()->filter($request)->get();
+            $booking = Booking::with('user','book.copies')->withTrashed()->filter($request)->get();
 
             return BookingResource::collection($booking);
         } catch (ValidationException $ex) {
@@ -47,7 +47,7 @@ class IndexController extends Controller
     public function getPaginate(Request $request)
     {
         try {
-            $booking = Booking::with('user','book')->filter($request)->get();
+            $booking = Booking::with('user','book.copies')->filter($request)->get();
 
             return Booking::collection($booking)->paginate($request->pag);
         } catch (ValidationException $ex) {

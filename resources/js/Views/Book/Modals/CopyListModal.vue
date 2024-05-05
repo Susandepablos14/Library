@@ -11,49 +11,80 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Título del Libro</th>
-                                <th>Cantidad</th>
-                                <th>Estado</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="copy in copies" :key="copy.id">
-                                <td>{{ copy.id }}</td>
-                                <td>{{ copy.book.title }}</td>
-                                <td>{{ copy.quantity }}</td>
-                                <td>{{ copy.status }}</td>
-                                <td>
+                    <form @submit.prevent="addCopy">
+                        <input type="hidden" v-model="newCopy.book_id">
+                        <div class="form-group">
+                            <label for="quantity">Cantidad:</label>
+                            <input type="number" class="form-control" id="quantity" v-model="newCopy.quantity" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Estado:</label>
+                            <select class="form-control" id="status" v-model="newCopy.status" required @change="handleStatusChange">
+                                <option value="Disponible">Disponible</option>
+                                <option value="Perdido">Perdido</option>
+                            </select>
+                        </div>
+                        <div v-if="newCopy.status === 'Perdido'" class="form-group">
+                            <label for="reason">Razón de la pérdida:</label>
+                            <select class="form-control" id="status" v-model="newCopy.reason" required @change="handleStatusChange">
+                                <option value="Disponible">Libro(s) disponible(s)</option>
+                                <option value="Prestado">Libro(s) prestados(s)</option>
+                            </select>
+                        </div>
+                        <!-- Botón "Añadir Copia" -->
+                        <div class="form-group text-right">
+                            <button type="submit" class="btn btn-primary">Añadir Copia</button>
+                        </div>
+                    </form>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Título del Libro</th>
+                                    <th>Cantidad</th>
+                                    <th>Estado</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="copy in copies" :key="copy.id">
+                                    <td>{{ copy.id }}</td>
+                                    <td>{{ copy.book.title }}</td>
+                                    <td>{{ copy.quantity }}</td>
+                                    <td>{{ copy.status }}</td>
+                                    <td>
 
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger text-white btn-icon-split mb-4" data-dismiss="modal">
+                    <button type="button" class="btn btn-danger text-white btn-icon-split" data-dismiss="modal">
                         <span class="text font-montserrat font-weight-bold">Cerrar</span>
-                    </button>
-                    <button type="button" class="btn btn-primary text-white btn-icon-split mb-4" @click="showAddCopy(copies)">
-                        <span class="text font-montserrat font-weight-bold">Añadir copia</span>
                     </button>
                 </div>
             </div>
         </div>
-        <AddCopyModal ref="addCopyModalRef"></AddCopyModal>
     </div>
 </template>
 
 <script>
-import AddCopyModal from "./AddCopyModal";
+import axios from 'axios';
+import toastr from "toastr";
 
 export default {
+    data() {
+        return {
+            newCopy: {
+                book_id: '',
+                quantity: '',
+                status: 'Disponible',
+                reason: ''
+            }
+        };
+    },
     components: {
-        AddCopyModal
     },
     props: {
         copies: {
@@ -62,22 +93,44 @@ export default {
         }
     },
     methods: {
-        showCopiesModal() {
+        showCopiesModal(bookId) {
+            this.newCopy.book_id = bookId;
             $("#copyModal").modal("show");
         },
-        showAddCopy(copies) {
-            if (!Array.isArray(copies) || copies.length === 0) {
-                console.error('Error: No se proporcionó un array válido de copias.');
-                return;
-            }
-
-            const bookId = copies[0].book_id;
-            const copyId = copies[0] ? copies[0].id : null;
-
-            this.$refs.addCopyModalRef.showAddCopyModal(bookId, copyId);
-        },
-
-    }
+        addCopy() {
+            const url = `copy/${this.newCopy.book_id }/book`;
+            axios.post(url, this.newCopy)
+                .then(response => {
+                    // Éxito
+                    toastr.success('Copia añadida exitosamente.');
+                    // Restablecer los valores del formulario
+                    this.resetForm();
+                })
+                .catch(error => {
+                    // Error
+                    toastr.error('Error al añadir copia.');
+                    console.error(error);
+                });
+            },
+            handleStatusChange() {
+                if (this.newCopy.status !== 'Perdido') {
+                    this.newCopy.reason = '';
+                } else {
+                    if (this.newCopy.reason === 'Disponible') {
+                    } else if (this.newCopy.reason === 'Prestado') {
+                    }
+                }
+            },
+            resetForm() {
+            const bookId = this.newCopy.book_id;
+            this.newCopy = {
+                book_id: bookId,
+                quantity: '',
+                status: 'Disponible',
+                reason: ''
+            };
+        }
+        }
 };
 </script>
 

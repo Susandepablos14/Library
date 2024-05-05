@@ -29,17 +29,18 @@
 </head>
 
 <body id="page-top">
-    <div>
+    <div id="app">
         <main>
             <nav class="navbar navbar-expand navbar-dark bg-dark static-top">
 
                 <a class="navbar-brand mr-1" href="/">
                     <img src="{{ asset('img/logo.png') }}" alt="Mi Sitio" style="height:30px; width:auto;">
                 </a>
-
-                <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
-                    <i class="fas fa-bars"></i>
-                </button>
+                @can('toogle')
+                    <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                @endcan
 
                 <ul class="navbar-nav ml-auto mr-0 mr-md-3 my-2 my-md-0">
                     {{-- <li class="nav-item dropdown no-arrow mx-1">
@@ -83,89 +84,96 @@
                 </ul>
 
             </nav>
-            <div id="wrapper">
-                <!-- Sidebar -->
-                <ul class="sidebar navbar-nav">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/">
-                            <i class="fas fa-fw fa-tachometer-alt"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    @can('users.index')
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('users.index') }}">
-                                <i class="fas fa-users"></i>
-                                <span>Usuarios</span>
+            @can('home')
+                <div id="wrapper">
+                    <!-- Sidebar -->
+                    <ul class="sidebar navbar-nav">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="/">
+                                <i class="fas fa-fw fa-tachometer-alt"></i>
+                                <span>Dashboard</span>
                             </a>
                         </li>
-                    @endcan
-                    @can('seguridad')
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-user-lock"></i>
-                                <span>Seguridad</span>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-                                <h6 class="dropdown-header">Seguridad:</h6>
-                                @can('roles.index')
-                                    <a class="dropdown-item" href="{{ route('roles.index') }}">Roles</a>
-                                @endcan
-                                @can('permissions.index')
-                                    <a class="dropdown-item" href="{{ route('permissions.index') }}">Permisos</a>
-                                @endcan
-                                @can('logs.index')
-                                    <a class="dropdown-item" href="{{ route('logs.index') }}">Logs</a>
-                                @endcan
+                        @can('users.index')
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('users.index') }}">
+                                    <i class="fas fa-users"></i>
+                                    <span>Usuarios</span>
+                                </a>
+                            </li>
+                        @endcan
+                        @can('security')
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-user-lock"></i>
+                                    <span>Seguridad</span>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="pagesDropdown">
+                                    <h6 class="dropdown-header">Seguridad:</h6>
+                                    @can('roles.index')
+                                        <a class="dropdown-item" href="{{ route('roles.index') }}">Roles</a>
+                                    @endcan
+                                    @can('permissions.index')
+                                        <a class="dropdown-item" href="{{ route('permissions.index') }}">Permisos</a>
+                                    @endcan
+                                    @can('logs.index')
+                                        <a class="dropdown-item" href="{{ route('logs.index') }}">Logs</a>
+                                    @endcan
+                                </div>
+                            </li>
+                        @endcan
+                        @can('config')
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-cogs"></i>
+                                    <span>Configuración</span>
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="pagesDropdown">
+                                    <h6 class="dropdown-header">Configuracion:</h6>
+                                    @can('countries.index')
+                                        <a class="dropdown-item" href="{{ route('countries.index') }}">Países</a>
+                                    @endcan
+                                    @can('categories.index')
+                                        <a class="dropdown-item" href="{{ route('categories.index') }}">Categorias</a>
+                                    @endcan
+                                    @can('authors.index')
+                                        <a class="dropdown-item" href="{{ route('authors.index') }}">Autores</a>
+                                    @endcan
+                                    @can('editorials.index')
+                                        <a class="dropdown-item" href="{{ route('editorials.index') }}">Editoriales</a>
+                                    @endcan
+                                    @can('books.index')
+                                        <a class="dropdown-item" href="{{ route('books.index') }}">Libros</a>
+                                    @endcan
+                                    @can('copies.index')
+                                        <a class="dropdown-item" href="{{ route('copies.index') }}">Copias</a>
+                                    @endcan
+                                    @can('bookings.index')
+                                        <a class="dropdown-item" href="{{ route('bookings.index') }}">Reservaciones</a>
+                                    @endcan
+                                    @can('loans.index')
+                                        <a class="dropdown-item" href="{{ route('loans.index') }}">Prestamos</a>
+                                    @endcan
                             </div>
-                        </li>
+                            </li>
+                        @endcan
                     @endcan
-                    @can('config')
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-cogs"></i>
-                                <span>Configuración</span>
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="pagesDropdown">
-                                <h6 class="dropdown-header">Configuracion:</h6>
-                                @can('countries.index')
-                                    <a class="dropdown-item" href="{{ route('countries.index') }}">Países</a>
-                                @endcan
-                                @can('categories.index')
-                                    <a class="dropdown-item" href="{{ route('categories.index') }}">Categorias</a>
-                                @endcan
-                                @can('authors.index')
-                                    <a class="dropdown-item" href="{{ route('authors.index') }}">Autores</a>
-                                @endcan
-                                @can('editorials.index')
-                                    <a class="dropdown-item" href="{{ route('editorials.index') }}">Editoriales</a>
-                                @endcan
-                                @can('books.index')
-                                    <a class="dropdown-item" href="{{ route('books.index') }}">Libros</a>
-                                @endcan
-                                @can('copies.index')
-                                    <a class="dropdown-item" href="{{ route('copies.index') }}">Copias</a>
-                                @endcan
-                                @can('bookings.index')
-                                <a class="dropdown-item" href="{{ route('bookings.index') }}">Reservaciones</a>
-                            @endcan
-                            </div>
-                        </li>
-                    @endcan
-                </ul>
-                <div id="content-wrapper">
-                    @yield('content')
-                    <footer class="sticky-footer">
-                        <div class="container my-auto">
-                            <div class="copyright text-center my-auto">
-                                <span>Copyright © Neptuno 2024</span>
-                            </div>
-                        </div>
-                    </footer>
+                    </ul>
+                    <div id="content-wrapper">
+                        @yield('content')
+                        @can('footer')
+                            <footer class="sticky-footer">
+                                <div class="container my-auto">
+                                    <div class="copyright text-center my-auto">
+                                        <span>Copyright © Neptuno 2024</span>
+                                    </div>
+                                </div>
+                            </footer>
+                        @endcan
+                    </div>
                 </div>
-            </div>
         </main>
     </div>
 

@@ -19,7 +19,7 @@ class CreateLoansTable extends Migration
                 ->constrained()
                 ->restrictOnDelete()
                 ->cascadeOnUpdate();
-            $table->foreignId('book_id')
+            $table->foreignId('booking_id')
                 ->constrained()
                 ->restrictOnDelete()
                 ->cascadeOnUpdate();

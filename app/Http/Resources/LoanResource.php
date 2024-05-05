@@ -19,7 +19,7 @@ class LoanResource extends JsonResource
             'attributes' => [
                 'id' => $this->resource->id,
                 'user_id' => $this->resource->user_id,
-                'book_id' => $this->resource->book_id,
+                'booking_id' => $this->resource->booking_id,
                 'loan_date' => $this->resource->loan_date,
                 'return_date' => $this->resource->return_date,
                 'status' => $this->resource->status,
@@ -28,7 +28,7 @@ class LoanResource extends JsonResource
             ],
             'relationships' => [
                 'user' => new UserResource($this->whenLoaded('user')),
-                'book' => new BookResource($this->whenLoaded('book')),
+                'booking' => new BookingResource($this->whenLoaded('booking')),
             ]
         ];
     }

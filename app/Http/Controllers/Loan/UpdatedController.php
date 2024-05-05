@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\Booking;
+namespace App\Http\Controllers\Loan;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Booking\BookingUpdateRequest;
-use App\Models\Booking;
+use App\Http\Requests\Loan\LoanUpdateRequest;
+use App\Models\Loan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 class UpdatedController extends Controller
 {
-    public function updated(BookingUpdateRequest $request, Booking $id)
+    public function updated(LoanUpdateRequest $request, Loan $id)
     {
         try {
 

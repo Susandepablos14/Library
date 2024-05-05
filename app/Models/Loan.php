@@ -12,7 +12,7 @@ class Loan extends Model
 
     protected $fillable = [
         'user_id',
-        'book_id',
+        'booking_id',
         'loan_date',
         'return_date',
         'status',
@@ -23,8 +23,16 @@ class Loan extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function book()
+    public function booking()
     {
-        return $this->belongsTo(Book::class);
+        return $this->belongsTo(Booking::class);
+    }
+
+    public function scopeFilter($query, $request)
+    {
+        return $query
+            ->when($request->status, function ($query, $status) {
+                return $query->where('status', 'like', "%status%");
+            });
     }
 }

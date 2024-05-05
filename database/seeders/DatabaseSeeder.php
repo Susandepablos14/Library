@@ -18,6 +18,6 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleSeeder::class);
         $this->call(CountryTableSeeder::class);
         $this->call(CategoryTableSeeder::class);
-
+        $this->call(AuthorTableSeeder::class);
     }
 }

@@ -139,6 +139,14 @@ Route::group(
         Route::get('{bookId}/copies', [App\Http\Controllers\Book\IndexController::class, 'getCopiesByBookId'])
             ->middleware('permission:books.index');
 
+        Route::get('detail/{id}', [App\Http\Controllers\HomeController::class, 'bookDetail'])
+            ->name('book-detail')
+            ->middleware('permission:books.detail');
+
+        Route::get('loan/detail/{id}', [App\Http\Controllers\Loan\LoanController::class, 'index'])
+            ->name('loan.page')
+            ->middleware('permission:books.loan');
+
     }
 );
 
@@ -178,6 +186,7 @@ Route::group(
             ->middleware('permission:bookings.index');
 
         Route::post('create', [App\Http\Controllers\Booking\CreateController::class, 'create'])
+            ->name('booking.create')
             ->middleware('permission:bookings.create');
 
 //         Route::delete('delete/{id}', [App\Http\Controllers\Booking\DeleteController::class, 'destroy'])
@@ -185,6 +194,33 @@ Route::group(
 
         Route::get('get', [App\Http\Controllers\Booking\IndexController::class, 'get'])
             ->middleware('permission:bookings.index');
+
     }
 
 );
+
+
+Route::group(
+    [
+        'prefix'     => 'loan'
+    ],
+    function () {
+
+        Route::get('', [App\Http\Controllers\Loan\IndexController::class, 'index'])
+            ->name('loans.index')
+            ->middleware('permission:loans.index');
+
+        Route::post('create', [App\Http\Controllers\Loan\CreateController::class, 'create'])
+            ->middleware('permission:loans.create');
+
+//         Route::delete('delete/{id}', [App\Http\Controllers\Loans\DeleteController::class, 'destroy'])
+//             ->middleware('permission:loanss.delete');
+
+        Route::get('get', [App\Http\Controllers\Loan\IndexController::class, 'get'])
+            ->middleware('permission:loans.index');
+
+
+    }
+
+);
+

@@ -13,7 +13,7 @@
         <div class="modal-content">
           <div class="modal-header py-2">
             <h5 class="modal-title title-page text-secondary" id="exampleModalLabel">
-               Modificar Libro
+               Modificar Autor
             </h5>
             <a
               type="button"
@@ -25,70 +25,49 @@
             </a>
           </div>
           <div class="modal-body">
-            <label for="title" class="form-label">Título</label>
+            <label for="name" class="form-label">Nombre</label>
+
             <input
-              type="text"
-              id="title"
+              type="name"
+              id="name"
               class="form-control form-control-user mb-3"
               autofocus
-              name="title"
-              v-model="form.title"
+              name="name"
+              v-model="form.name"
             />
 
-            <label for="description" class="form-label">Descripción</label>
-                <textarea
-                type="text"
-                id="description"
-                class="form-control form-control-user mb-3"
-                autofocus
-                name="description"
-                v-model="form.description"
-                rows="3"
-                ></textarea>
+            <label for="biography" class="form-label">Biografía</label>
+            <textarea
+            type="text"
+            id="biography"
+            class="form-control form-control-user mb-3"
+            autofocus
+            name="biography"
+            v-model="form.biography"
+            rows="3"
+            ></textarea>
+
+            <label for="birthdate" class="form-label">Fecha de Nacimiento</label>
+            <input
+              type="date"
+              id="birthdate"
+              class="form-control form-control-user mb-3"
+              autofocus
+              name="birthdate"
+              v-model="form.birthdate"
+            />
 
             <div class="mb-3">
-                <label for="author_id" class="form-label">Autor</label>
+                <label for="country_id" class="form-label">Nacionalidad</label>
                 <select
-                    v-model="form.author_id"
+                    v-model="form.country_id"
                     class="form-control"
-                    id="author_id"
-                    name="author_id"
+                    id="country_id"
+                    name="country_id"
                 >
-                    <option v-for="author in authors" :value="author.id">{{ author.name }}</option>
-                </select>
-                </div>
-            <div class="mb-3">
-                <label for="editorial_id" class="form-label">Editorial</label>
-                <select
-                    v-model="form.editorial_id"
-                    class="form-control"
-                    id="editorial_id"
-                    name="editorial_id"
-                >
-                    <option v-for="editorial in editorials" :value="editorial.id">{{ editorial.name }}</option>
-                </select>
-                </div>
-            <div class="mb-3">
-                <label for="category_id" class="form-label">Categoría</label>
-                <select
-                    v-model="form.category_id"
-                    class="form-control"
-                    id="category_id"
-                    name="category_id"
-                >
-                    <option v-for="category in categories" :value="category.id">{{ category.name }}</option>
+                    <option v-for="country in countries" :value="country.id">{{ country.nationality }}</option>
                 </select>
               </div>
-
-            <label for="publication_date" class="form-label">Fecha de Publicación</label>
-              <input
-                type="text"
-                id="publication_date"
-                class="form-control form-control-user mb-3"
-                autofocus
-                name="publication_date"
-                v-model="form.publication_date"
-              />
 
             <div>
                 <label class="form-label mb-2">{{ imageLabel }}</label>
@@ -115,7 +94,7 @@
                     </button>
                 </div>
             </div>
-                <small class="text-muted">Dimensiones de la imagen mínima:  100x150 / máxima: 400x600</small>
+              <small class="text-muted">Dimensiones de la imagen mínima: 30x30 / máxima: 80x80</small>
             </div>
           <div class="modal-footer">
             <a
@@ -146,7 +125,7 @@ import axios from "axios";
 import toastr from "toastr";
 
 export default {
-  name: "BookUpdate",
+  name: "AuthorUpdate",
   components: {},
 
   created() {
@@ -160,9 +139,6 @@ export default {
       imageName: '',
       isNewImage: false,
       originalImageName: '',
-      authors: [],
-      editorials: [],
-      categories: [],
       };
     },
     computed: {
@@ -185,9 +161,7 @@ export default {
         },
     createPermission: function () {
       const formData = new FormData();
-      formData.append("author_id", this.form.author_id);
-      formData.append("editorial_id", this.form.editorial_id);
-      formData.append("category_id", this.form.category_id);
+      formData.append("country_id", this.form.country_id);
         if (this.image) {
             formData.append("image", this.image);
             formData.append("image_name", this.image.name);
@@ -197,13 +171,13 @@ export default {
             formData.append(key, this.form[key]);
         }
 
-        var url = "/book/" + this.form.id;
+        var url = "/author/" + this.form.id;
         axios
             .post(url, formData)
         .then((response) => {
           this.errors = [];
           this.getClearFormObject();
-          toastr.success("Libro Modificado");
+          toastr.success("Autor Modificado");
           $("#exampleModal2").modal("hide");
           this.$emit("GetCreatedRol");
           window.location.reload();
@@ -218,52 +192,36 @@ export default {
         });
     },
     getKeeps() {
-        var urlAuthors = "/author/get";
-        var urlEditorials = "/editorial/get";
-        var urlCategories = "/category/get";
+        var urlCountries = "/country/get";
         axios
           .all([
-            axios.get(urlAuthors),
-            axios.get(urlEditorials),
-            axios.get(urlCategories),
+            axios.get(urlCountries),
           ])
-          .then(axios.spread((responseAuthors, responseEditorials, responseCategories) => {
-            this.authors = responseAuthors.data.data.map(author => ({
-              name: author.attributes.name,
-              id: author.id
-            }))
-            this.editorials = responseEditorials.data.data.map(editorial => ({
-              name: editorial.attributes.name,
-              id: editorial.id
-            }))
-            this.categories = responseCategories.data.data.map(category => ({
-              name: category.attributes.name,
-              id: category.id
-            }))
+          .then(axios.spread((responseCountries) => {
+            this.countries = responseCountries.data.data.map(country => ({
+              nationality: country.attributes.nationality,
+              id: country.id
+            }));
           }))
           .catch((error) => {});
-      },
+    },
 
     UpdateGetRol(role) {
       this.form.id = role.id|| "";
-      this.form.title = role.attributes.title|| "";
-      this.form.description = role.attributes.description|| "";
-      this.form.author_id = role.attributes.author_id|| "";
-      this.form.editorial_id = role.attributes.editorial_id|| "";
-      this.form.category_id = role.attributes.category_id|| "";
-      this.form.publication_date = role.attributes.publication_date|| "";
+      this.form.name = role.attributes.name|| "";
+      this.form.biography = role.attributes.biography|| "";
+      this.form.birthdate = role.attributes.birthdate|| "";
+      this.form.country_id = role.attributes.country_id|| "";
       this.imageName = role.relationships.image.attributes.name;
       this.originalImageName = this.imageName
     },
     getClearFormObject() {
       return {
         id: "",
-        title: "",
-        description: "",
-        author_id: "",
-        editorial_id: "",
-        category_id: "",
-        publication_date: "",
+        name: "",
+        biography: "",
+        birthdate: "",
+        country_id: "",
       };
     },
   },

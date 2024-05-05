@@ -19,36 +19,36 @@ class IndexController extends Controller
 
     public function get(Request $request)
     {
-        try {
-            $book = Book::with('image','author','editorial','category','copies','bookings', 'loans','comments')->withTrashed()->filter($request)->get();
+        // try {
+            $book = Book::with('image','author','editorial','category','copies','bookings','comments')->withTrashed()->filter($request)->get();
 
             return BookResource::collection($book);
-        } catch (ValidationException $ex) {
-            return response()->json(
-                [
-                'data' => [
-                    'title'  => $ex->getMessage(),
-                    'errors' => collect($ex->errors())->flatten()
-                ]
-                ], Response::HTTP_UNPROCESSABLE_ENTITY
-            );
-        } catch (\Exception $ex) {
-            return response()->json(
-                [
-                'data' => [
-                    'code'        => $ex->getCode(),
-                    'title'       => __('errors.server.title'),
-                    'description' => __('errors.server.description'),
-                ]
-                ], Response::HTTP_INTERNAL_SERVER_ERROR
-            );
-        }
+        // } catch (ValidationException $ex) {
+        //     return response()->json(
+        //         [
+        //         'data' => [
+        //             'title'  => $ex->getMessage(),
+        //             'errors' => collect($ex->errors())->flatten()
+        //         ]
+        //         ], Response::HTTP_UNPROCESSABLE_ENTITY
+        //     );
+        // } catch (\Exception $ex) {
+        //     return response()->json(
+        //         [
+        //         'data' => [
+        //             'code'        => $ex->getCode(),
+        //             'title'       => __('errors.server.title'),
+        //             'description' => __('errors.server.description'),
+        //         ]
+        //         ], Response::HTTP_INTERNAL_SERVER_ERROR
+        //     );
+        // }
     }
 
     public function getPaginate(Request $request)
     {
         try {
-            $book = Book::with('image','author','editorial','category','copies','bookings', 'loans','comments')->filter($request)->get();
+            $book = Book::with('image','author','editorial','category','copies','bookings','comments')->filter($request)->get();
 
             return BookResource::collection($book)->paginate($request->pag);
         } catch (ValidationException $ex) {

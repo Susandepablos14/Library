@@ -29,7 +29,7 @@ class AuthorUpdateRequest extends FormRequest
             'biography' => 'nullable|string|min:3',
             'birthdate' => 'required|date|before:today',
             'country_id' => 'required|exists:countries,id',
-            'image' => 'nullable|dimensions:min_width=30,min_height=30,max_width=80,max_height=80',
+            'image' => 'nullable',
         ];
 
     }
